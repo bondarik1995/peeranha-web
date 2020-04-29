@@ -6,6 +6,7 @@ import Li from './index';
 const CheckedItem = Li.extend`
   font-weight: ${({ isActive }) => (isActive ? 'bold' : 'normal')};
   border: 1px solid ${BORDER_TRANSPARENT};
+  white-space: nowrap;
 
   :before {
     content: '';

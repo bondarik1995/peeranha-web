@@ -36,12 +36,18 @@ const styles = {
     h3LetterSpacing: '1px',
     tagsLetterSpacing: '1px',
     questionTitleLetterSpacing: '1px',
+    mainLinksSelectedLetterSpacing: '1px',
+    mainLinksNotSelectedLetterSpacing: '1px',
     h3: 'Neue Haas Grotesk Display Pro Medium, Source Sans Pro, sans-serif',
     main: 'Neue Haas Grotesk Display Pro Light, Source Sans Pro, sans-serif',
     questionItemTitle:
       'Neue Haas Grotesk Display Pro Medium, Source Sans Pro, sans-serif',
     questionTitleFont:
       'Neue Haas Grotesk Display Pro Medium, Source Sans Pro, sans-serif',
+    mainLinksSelected:
+      'Neue Haas Grotesk Display Pro Medium, Source Sans Pro, sans-serif',
+    mainLinksNotSelected:
+      'Neue Haas Grotesk Display Pro Light, Source Sans Pro, sans-serif',
   },
   colors: {
     blue: '#5D6DFE',

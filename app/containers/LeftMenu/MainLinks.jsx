@@ -50,7 +50,7 @@ const A1 = A.extend`
     background-color: ${PRIMARY_SPECIAL};
     border-color: ${BORDER_PRIMARY_DARK};
     font-family: ${fonts.mainLinksSelected || APP_FONT};
-    letter-spacing: 0.5px;
+    letter-spacing: ${fonts.mainLinksSelectedLetterSpacing || 'normal'};
     font-weight: bold;
     color: ${colors.mainLinks ? colors.mainLinks : TEXT_DARK} !important;
     :hover {
@@ -63,6 +63,7 @@ const A1 = A.extend`
     border-color: ${BORDER_TRANSPARENT};
     font-weight: normal;
     font-family: ${fonts.mainLinksNotSelected || APP_FONT};
+    letter-spacing: ${fonts.mainLinksNotSelectedLetterSpacing || 'normal'};
     .opacity {
       fill: none !important;
     }

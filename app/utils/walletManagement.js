@@ -1,4 +1,6 @@
 /* eslint camelcase: 0 */
+import _get from 'lodash/get';
+import _last from 'lodash/last';
 import { getFormattedNum3 } from './numbers';
 
 import {
@@ -152,14 +154,13 @@ export async function getWeekStat(eosService, profile) {
     }
   });
 
-  const numberOfPeriods =
-    Math.ceil(
-      (Date.now() / 1000 - +process.env.RELEASE_DATE) /
-        +process.env.WEEK_DURATION,
-    ) - 1;
+  const numberOfPeriods = Math.ceil(
+    (Date.now() / 1000 - +process.env.RELEASE_DATE) /
+      +process.env.WEEK_DURATION,
+  );
 
   // Fill by periods with 0 reward - they not stored in blockchain
-  return new Array(numberOfPeriods)
+  const weekStat = new Array(numberOfPeriods)
     .fill()
     .map((_, index) => {
       const existingPeriod = normalizedRewards.find(
@@ -180,6 +181,35 @@ export async function getWeekStat(eosService, profile) {
     })
     .filter(x => x.periodFinished > profile.registration_time)
     .reverse();
+
+  // registration week
+  const last = _last(weekStat);
+  if (!weekStat.length) {
+    weekStat.push({
+      registrationWeek: true,
+      period:
+        _get(last, 'period', null) - 1 ||
+        Math.ceil(
+          (Date.now() / 1000 - +process.env.RELEASE_DATE) /
+            +process.env.WEEK_DURATION,
+        ) - 1,
+      periodStarted:
+        new Date(
+          (profile.registration_time - +process.env.WEEK_DURATION) * 1000,
+        )
+          .setMinutes(0, 0, 0)
+          .valueOf() / 1000,
+      periodFinished:
+        _get(last, 'periodStarted', null) ||
+        new Date(profile.registration_time * 1000)
+          .setMinutes(0, 0, 0)
+          .valueOf() / 1000,
+    });
+  } else {
+    last.registrationWeek = true;
+  }
+
+  return weekStat;
 }
 
 export async function sendTokens(

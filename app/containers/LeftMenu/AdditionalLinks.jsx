@@ -43,8 +43,8 @@ const AdditionalLinks = styled.div`
 `;
 
 const Img = styled.img`
-  width: ${({ alt }) => (alt === 'telos' ? 40 : 60)}px;
-  height: 12px;
+  width: ${({ alt }) => (alt === 'telos' ? 38 : 60)}px;
+  height: 13px;
   filter: gray;
   filter: grayscale(100%);
 `;

@@ -16,6 +16,9 @@ import P from 'components/P';
 import Grid from 'components/Grid';
 
 import messages from './messages';
+import { singleCommunityFonts } from '../../utils/communityManagement';
+
+const fonts = singleCommunityFonts();
 
 const Tag = styled.li`
   height: 140px;
@@ -111,7 +114,9 @@ const Content = ({
               }}
             >
               <p>
-                <TagName>{x.name}</TagName>
+                <TagName letterSpacing={fonts.tagsLetterSpacing}>
+                  {x.name}
+                </TagName>
                 <Span fontSize="14" color={TEXT_SECONDARY}>
                   <span>x </span>
                   <span>{`${x.questions_asked}`}</span>

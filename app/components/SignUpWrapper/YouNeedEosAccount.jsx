@@ -13,7 +13,7 @@ import Button from 'components/Button/Outlined/InfoLarge';
 import A from 'components/A';
 
 import peeranhaLogo from 'images/LogoBlack.svg?inline';
-import telosIcon from 'images/telosIcon.svg?inline';
+import telosIcon from 'images/communities-logos/telos.png';
 
 import H3 from 'components/H3';
 
@@ -43,7 +43,7 @@ const LeftMenu = ({ faqQuestions, route }) => (
         values={{
           image: (
             <a href="https://www.telosfoundation.io/" target="_blank">
-              <img src={telosIcon} alt="telos" />
+              <img src={telosIcon} height="30" alt="telos" />
             </a>
           ),
         }}

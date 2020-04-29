@@ -23,6 +23,7 @@ const Tag = Span.extend`
   white-space: nowrap;
   display: inline-flex;
   align-items: center;
+  letter-spacing: ${({ letterSpacing }) => letterSpacing || 'normal'};
 `;
 
 const Box = styled.ul`

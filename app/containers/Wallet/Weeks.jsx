@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
 import styled from 'styled-components';
 import { FormattedMessage } from 'react-intl';
 
@@ -8,7 +7,11 @@ import { TEXT_WARNING_LIGHT, TEXT_SECONDARY } from 'style-constants';
 
 import { getFormattedNum3 } from 'utils/numbers';
 import { getFormattedDate } from 'utils/datetime';
-import { FULL_MONTH_NAME_DAY_YEAR, DD_MM_YY } from 'utils/constants';
+import {
+  FULL_MONTH_NAME_DAY_YEAR,
+  DD_MM_YY,
+  MONTH_3LETTERS__DAY_TIME,
+} from 'utils/constants';
 
 import calendarImage from 'images/calendar.svg?inline';
 import currencyPeerImage from 'images/currencyPeer.svg?inline';
@@ -23,7 +26,6 @@ import PickupButton from 'components/Button/Contained/InfoLarge';
 import ReceivedButton from 'components/Button/Contained/SecondaryLarge';
 
 import messages from './messages';
-import { makeSelectProfileInfo } from '../AccountProvider/selectors';
 
 const BaseRoundedLi = BaseRounded.extend`
   position: relative;
@@ -60,9 +62,21 @@ const WeekNumber = ({
       </Span>
 
       <Span className="d-none d-md-inline-block">
-        {getFormattedDate(periodStarted, locale, FULL_MONTH_NAME_DAY_YEAR)}
+        {getFormattedDate(
+          periodStarted,
+          locale,
+          process.env.ENV === 'prod'
+            ? FULL_MONTH_NAME_DAY_YEAR
+            : MONTH_3LETTERS__DAY_TIME,
+        )}
         {' — '}
-        {getFormattedDate(periodFinished, locale, FULL_MONTH_NAME_DAY_YEAR)}
+        {getFormattedDate(
+          periodFinished,
+          locale,
+          process.env.ENV === 'prod'
+            ? FULL_MONTH_NAME_DAY_YEAR
+            : MONTH_3LETTERS__DAY_TIME,
+        )}
       </Span>
 
       <Span className="d-inline-block d-md-none" mobileFS={14}>
@@ -80,12 +94,15 @@ const CurrentWeek = ({
   periodStarted,
   periodFinished,
   currentWeeksNumber,
+  registrationWeek,
 }) => (
   <li className="flex-grow-1 mb-3">
     <Base position="top">
       <P className="mb-1" color={TEXT_WARNING_LIGHT} fontSize="13">
         <FormattedMessage
-          {...messages[period ? 'currentPeriod' : 'registrationWeek']}
+          {...messages[
+            !registrationWeek ? 'currentPeriod' : 'registrationWeek'
+          ]}
         />
       </P>
       <WeekNumber
@@ -99,13 +116,17 @@ const CurrentWeek = ({
     <Base className="d-flex align-items-center" position="bottom">
       <img className="mr-3" src={calendarImage} alt="calendar" />
       <Span mobileFS={14}>
-        <FormattedMessage
-          {...messages[
-            currentWeeksNumber
-              ? 'periodStillInProgress'
-              : 'thisIsRegistrationWeek'
-          ]}
-        />
+        {registrationWeek ? (
+          <FormattedMessage {...messages.thisIsRegistrationWeek} />
+        ) : (
+          <FormattedMessage
+            {...messages[
+              currentWeeksNumber
+                ? 'periodStillInProgress'
+                : 'thisIsRegistrationWeek'
+            ]}
+          />
+        )}
       </Span>
     </Base>
   </li>
@@ -265,11 +286,12 @@ const Weeks = ({
   pickupRewardDispatch,
   pickupRewardProcessing,
   ids,
-  profile,
 }) => {
   const currentWeeksNumber = weekStat && ((weekStat[0] && 1) || 0);
 
   const pendingWeek = weekStat ? weekStat[1] : null;
+
+  const paidOutWeeks = weekStat ? weekStat.slice(2) : [];
 
   return (
     <>
@@ -277,24 +299,14 @@ const Weeks = ({
         !getWeekStatProcessing && (
           <ul className="mt-3">
             <CurrentPendingWeeks inRow={weekStat.length >= 2}>
-              {weekStat.length > 1 ? (
+              {weekStat.length ? (
                 <CurrentWeek
                   currentWeeksNumber={currentWeeksNumber}
                   locale={locale}
                   {...weekStat[currentWeeksNumber === 2 ? 1 : 0]}
                   periodFinished={weekStat[0].periodFinished}
                 />
-              ) : (
-                <CurrentWeek
-                  currentWeeksNumber={0}
-                  locale={locale}
-                  period={0}
-                  periodStarted={profile.registration_time}
-                  periodFinished={
-                    profile.registration_time + +process.env.WEEK_DURATION
-                  }
-                />
-              )}
+              ) : null}
 
               {pendingWeek && (
                 <PendingWeek
@@ -305,18 +317,16 @@ const Weeks = ({
               )}
             </CurrentPendingWeeks>
 
-            {weekStat
-              .slice(2)
-              .map((x, index, arr) => (
-                <PaidOutWeek
-                  pickupRewardDispatch={pickupRewardDispatch}
-                  pickupRewardProcessing={pickupRewardProcessing}
-                  locale={locale}
-                  ids={ids}
-                  {...x}
-                  registrationWeek={index === arr.length - 1}
-                />
-              ))}
+            {paidOutWeeks.map(x => (
+              <PaidOutWeek
+                key={`${x.periodStarted}${x.periodFinished}`}
+                pickupRewardDispatch={pickupRewardDispatch}
+                pickupRewardProcessing={pickupRewardProcessing}
+                locale={locale}
+                ids={ids}
+                {...x}
+              />
+            ))}
           </ul>
         )}
 
@@ -339,6 +349,7 @@ CurrentWeek.propTypes = {
   periodStarted: PropTypes.number,
   periodFinished: PropTypes.number,
   currentWeeksNumber: PropTypes.number,
+  registrationWeek: PropTypes.bool,
 };
 
 PendingWeek.propTypes = {
@@ -370,11 +381,6 @@ Weeks.propTypes = {
   pickupRewardDispatch: PropTypes.func,
   getWeekStatProcessing: PropTypes.bool,
   pickupRewardProcessing: PropTypes.bool,
-  profile: PropTypes.object,
 };
 
-export default React.memo(
-  connect(state => ({
-    profile: makeSelectProfileInfo()(state),
-  }))(Weeks),
-);
+export default React.memo(Weeks);

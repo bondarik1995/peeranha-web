@@ -12,7 +12,7 @@ const H3 = Text.extend`
   display: flex;
   align-items: center;
   font-family: ${fonts.h3 || APP_FONT};
-  letter-spacing: ${fonts.h3LetterSpacing || APP_FONT};
+  letter-spacing: ${fonts.h3LetterSpacing || 'normal'};
 
   @media only screen and (max-width: 576px) {
     font-size: 28px;
